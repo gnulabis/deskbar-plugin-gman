@@ -1,0 +1,16 @@
+* Write README
+
+* Write INSTALL
+
+* Do not report entries when nothing appropriate is reported by backend
+
+* Check validity of synthesized man page full paths before reporting a hit
+
+* Match partial name from beginning of line only (eg. rs->"rs-ync" is ok, but rs->"XPa-rs-eColor" is not
+
+* Alternatively, provide special notation to enable partial matches in whole sentence
+
+* Limit number of displayed hits
+
+* Provide configuration option to set the above limit
+
