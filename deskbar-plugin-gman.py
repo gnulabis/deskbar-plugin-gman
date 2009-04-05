@@ -25,6 +25,7 @@ import deskbar.interfaces.Match
 import deskbar.core.Utils
 import deskbar.interfaces.Module
 import commands
+import os.path
 
 HANDLERS = ["GManPageModule"]
 
@@ -48,9 +49,6 @@ class GManPageAction(deskbar.interfaces.Action):
 	def get_icon(self):
 		return "gtk-help"
 		
-	def is_valid(self, text=None):
-		return 1
-#		return (os.path.exists(self._pagepath) and os.path.isfile(self._pagepath))
 		
 class GManPageMatch (deskbar.interfaces.Match):
 	
@@ -69,7 +67,7 @@ class GManPageModule (deskbar.interfaces.Module):
 	INFOS = {'icon': deskbar.core.Utils.load_icon("gtk-help"),
 		'name': 'Man page search',
 		'description': 'Search through available MAN pages',
-		'version': '0.0.2.1',
+		'version': '0.1.2.0',
 		}
 	
 	def __init__(self):
@@ -77,8 +75,22 @@ class GManPageModule (deskbar.interfaces.Module):
 		
 	def query(self, text):
 		if len(text) > 1:
-			outputofwhatis = commands.getstatusoutput( 'whatis -r ' + text )
+			if ( text[0] == '!' ) and (len(text) > 3):
+				outputofwhatis = commands.getstatusoutput( 'whatis -r ' + text[1:] )
+			else:
+				outputofwhatis = commands.getstatusoutput( 'whatis -w ' + text + '*' )
+
 			if outputofwhatis[1].endswith ( 'nothing appropriate.' ) is not True :
 				for match in outputofwhatis[1].splitlines():
 					self._emit_query_ready( text, [ GManPageMatch( match.split(' - ')[0].strip()) ] )
 
+	@staticmethod
+	def has_requirements():
+		if os.path.isfile("/usr/bin/whatis"):
+			if os.path.isfile("/usr/bin/yelp"):
+				return True
+			else:
+				GManPageModule.INSTRUCTIONS = 'Cannot find "yelp" in /usr/bin. Please install the Yelp package first'
+		else:
+			GManPageModule.INSTRUCTIONS = 'Cannot find "whatis" in /usr/bin. Please install the MAN database (man-db package) first'
+		return False
