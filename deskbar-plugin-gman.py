@@ -3,8 +3,6 @@ import deskbar.interfaces.Match
 import deskbar.core.Utils
 import deskbar.interfaces.Module
 import commands
-import os
-import os.path
 
 HANDLERS = ["GManPageModule"]
 
@@ -13,18 +11,14 @@ class GManPageAction(deskbar.interfaces.Action):
 	def __init__(self, page):
 		deskbar.interfaces.Action.__init__(self, page)
 
-		pageinfo = page.split(' ')
-		pagename = pageinfo[0].strip()
-		pagenum  = pageinfo[1].strip()[1]
-		pagesect = pageinfo[1].strip()[1:-1]
+		pageinfo     = page.split(' ')
+		pagename     = pageinfo[0].strip()
+		pagesection  = pageinfo[1].strip()
 
-		pagefolder = '/usr/share/man/man' + pagenum
-		pagefile   = pagename + '.' + pagesect + '.gz'
-
-		self._pagepath = os.path.join(pagefolder, pagefile)
+		self._page = 'man:' + pagename + pagesection
 
 	def activate(self, text=None):
-		deskbar.core.Utils.spawn_async( ['/usr/bin/yelp', self._pagepath] )
+		deskbar.core.Utils.spawn_async( [ '/usr/bin/yelp', self._page ] )
 		
 	def get_verb(self):
 		return "View \"%(name)s\" MAN page"
@@ -53,7 +47,7 @@ class GManPageModule (deskbar.interfaces.Module):
 	INFOS = {'icon': deskbar.core.Utils.load_icon("gtk-help"),
 		'name': 'Man page search',
 		'description': 'Search through available MAN pages',
-		'version': '0.0.1.1',
+		'version': '0.0.2.1',
 		}
 	
 	def __init__(self):
@@ -61,7 +55,8 @@ class GManPageModule (deskbar.interfaces.Module):
 		
 	def query(self, text):
 		if len(text) > 1:
-			outputofwhatis = commands.getstatusoutput('whatis -r ' + text)
-			for match in outputofwhatis[1].splitlines():
-				self._emit_query_ready( text, [GManPageMatch(match.split('-')[0].strip())] )
+			outputofwhatis = commands.getstatusoutput( 'whatis -r ' + text )
+			if outputofwhatis[1].endswith ( 'nothing appropriate.' ) is not True :
+				for match in outputofwhatis[1].splitlines():
+					self._emit_query_ready( text, [ GManPageMatch( match.split(' - ')[0].strip()) ] )
 
