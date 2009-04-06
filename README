@@ -1,0 +1,31 @@
+1. ABOUT
+
+deskbar-plugin-gman is a plugin for the deskbar applet. It allows searching of locally stored MAN pages. The selected MAN page is displayed using the GNOME documentation viewer (Yelp). 
+
+deskbar-plugin-gman is losely based on G-MAN (hence the name of the plugin), a "quick n' dirty" Bash script that accomplishes a similar goal.
+
+2. DEPENDENCIES
+
+deskbar-plugin-gman assumes that you have installed and are running the GNOME desktop environment, as well as the deskbar-applet itself. It has also been tested with XFCE, with the help of xfapplet (which allows you to load a GNOME applet in the XFCE panel).
+
+There are no build dependencies. To actually run the plugin, you need to have Yelp (basic component of GNOME), as well as the man-db package (fundamental part of most Linux distributions).
+
+If you are missing any of those two (Yelp and/or man-db), the plugin will refuse to load and will inform you of the problem.
+
+3. INSTALLATION
+
+Please follow the steps described in the INSTALL file.
+
+4. USAGE
+
+Provided that you have added the plugin to the list of available handlers in the preferences dialog of the deskbar-applet and you have enabled it, the basic usage is the same as for every other deskbar plugin: you type a query and you get a list of results.
+
+A couple of points that will help you understand and use more efficiently this plugin:
+
+- The plugin does not display any results for single character queries. It starts searching after you've typed the second character (unless a '!' is the first character -see below for an explanation-, in which case the plugin waits until you type the third character).
+
+- When you type something, the plugin tries to match it to the name of a MAN page, starting from its first letter. In other words, if you type "rsyn" (and you have installed the "rsync" application) the plugin will match "rsync" and "rsyncd.conf", but not "wcursyncup".
+
+- If you would like to type "rsyn" and get a match for "wcursyncup" as well, you should add the prefix '!' to your query (eg. "!rsyn").
+
+

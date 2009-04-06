@@ -4,7 +4,7 @@
 # viewer) 
 #
 # Author: Dimitris Lampridis <dlampridis_at_gmail.com>
-
+#
 # (C) Copyright 2009 Dimitris Lampridis
 #
 # This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import os.path
 
 NAME        = "G-Man"
 DESCRIPTION = "Search through available MAN pages"
-VERSION     = "0.2.0"
+VERSION     = "0.2.1"
 
 # configuration options
 WHATIS      = '/usr/bin/whatis'
