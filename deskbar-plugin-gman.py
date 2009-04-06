@@ -27,6 +27,16 @@ import deskbar.interfaces.Module
 import commands
 import os.path
 
+NAME        = "G-Man"
+DESCRIPTION = "Search through available MAN pages"
+VERSION     = "0.2.0"
+
+# configuration options
+WHATIS      = '/usr/bin/whatis'
+YELP        = '/usr/bin/yelp'
+PARTIALCHAR = '!'
+RESULTLIMIT = 10
+
 HANDLERS = ["GManPageModule"]
 
 class GManPageAction(deskbar.interfaces.Action):
@@ -41,7 +51,7 @@ class GManPageAction(deskbar.interfaces.Action):
 		self._page = 'man:' + pagename + pagesection
 
 	def activate(self, text=None):
-		deskbar.core.Utils.spawn_async( [ '/usr/bin/yelp', self._page ] )
+		deskbar.core.Utils.spawn_async( [ YELP, self._page ] )
 		
 	def get_verb(self):
 		return "View \"%(name)s\" MAN page"
@@ -65,9 +75,9 @@ class GManPageMatch (deskbar.interfaces.Match):
 class GManPageModule (deskbar.interfaces.Module):
 
 	INFOS = {'icon': deskbar.core.Utils.load_icon("gtk-help"),
-		'name': 'Man page search',
-		'description': 'Search through available MAN pages',
-		'version': '0.1.2.0',
+		'name': NAME,
+		'description': DESCRIPTION, 
+		'version': VERSION,
 		}
 	
 	def __init__(self):
@@ -75,22 +85,27 @@ class GManPageModule (deskbar.interfaces.Module):
 		
 	def query(self, text):
 		if len(text) > 1:
-			if ( text[0] == '!' ) and (len(text) > 3):
-				outputofwhatis = commands.getstatusoutput( 'whatis -r ' + text[1:] )
+			if ( text[0] == PARTIALCHAR ) and (len(text) > 2):
+				outputofwhatis = commands.getstatusoutput( WHATIS + ' -r ' + text[1:] )
 			else:
-				outputofwhatis = commands.getstatusoutput( 'whatis -w ' + text + '*' )
+				outputofwhatis = commands.getstatusoutput( WHATIS + ' -w ' + text + '*' )
 
 			if outputofwhatis[1].endswith ( 'nothing appropriate.' ) is not True :
-				for match in outputofwhatis[1].splitlines():
+				if len(outputofwhatis[1].splitlines()) > RESULTLIMIT:
+					results = outputofwhatis[1].splitlines()[:RESULTLIMIT]
+				else:
+					results = outputofwhatis[1].splitlines()
+
+				for match in results:
 					self._emit_query_ready( text, [ GManPageMatch( match.split(' - ')[0].strip()) ] )
 
 	@staticmethod
 	def has_requirements():
-		if os.path.isfile("/usr/bin/whatis"):
-			if os.path.isfile("/usr/bin/yelp"):
+		if os.path.isfile(WHATIS):
+			if os.path.isfile(YELP):
 				return True
 			else:
-				GManPageModule.INSTRUCTIONS = 'Cannot find "yelp" in /usr/bin. Please install the Yelp package first'
+				GManPageModule.INSTRUCTIONS = 'Cannot find "' + YELP + '". Please install the Yelp package first'
 		else:
-			GManPageModule.INSTRUCTIONS = 'Cannot find "whatis" in /usr/bin. Please install the MAN database (man-db package) first'
+			GManPageModule.INSTRUCTIONS = 'Cannot find "' + WHATIS + '". Please install the MAN database (man-db package) first'
 		return False

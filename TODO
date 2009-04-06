@@ -1,7 +1,9 @@
 * Write README
 
-* Limit number of displayed hits
+* Create configuration window 
 
-* Provide configuration option to set the above limit
+* Provide configuration option to set the path for "whatis" and "yelp"
+
+* Provide configuration option to limit the number of results
 
 * Provide configuration option to set the partial match special character
