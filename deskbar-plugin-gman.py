@@ -26,16 +26,11 @@ import deskbar.core.Utils
 import deskbar.interfaces.Module
 import commands
 import os.path
+import gtk
 
 NAME        = "G-Man"
 DESCRIPTION = "Search through available MAN pages"
-VERSION     = "0.2.1"
-
-# configuration options
-WHATIS      = '/usr/bin/whatis'
-YELP        = '/usr/bin/yelp'
-PARTIALCHAR = '!'
-RESULTLIMIT = 10
+VERSION     = "0.3.0"
 
 HANDLERS = ["GManPageModule"]
 
@@ -80,6 +75,11 @@ class GManPageModule (deskbar.interfaces.Module):
 		'version': VERSION,
 		}
 	
+	WhatisLocation  = '/usr/bin/whatis'
+	YelpLocation    = '/usr/bin/yelp'
+	SubStringSearch = '!'
+	MaxResults      = 10
+
 	def __init__(self):
 		deskbar.interfaces.Module.__init__(self)
 		
@@ -99,6 +99,62 @@ class GManPageModule (deskbar.interfaces.Module):
 				for match in results:
 					self._emit_query_ready( text, [ GManPageMatch( match.split(' - ')[0].strip()) ] )
 
+	def has_config(self):
+		return True
+
+	def show_config(self, parent):
+		GManConfigDialog = gtk.Dialog ( NAME + " config", parent,
+						gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+						( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+						  gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+		
+		GManWidgetMaxResults = gtk.HBox ()
+		GManWidgetMaxResultsSpin = gtk.SpinButton ()
+		GManWidgetMaxResultsSpin.set_range (1, 50)
+		GManWidgetMaxResultsSpin.set_increments (1,10)
+		GManWidgetMaxResultsSpin.show()
+		GManWidgetMaxResults.add ( GManWidgetMaxResultsSpin )
+		GManWidgetMaxResultsLabel = gtk.Label('max results')
+		GManWidgetMaxResultsLabel.show()
+		GManWidgetMaxResults.add ( GManWidgetMaxResultsLabel )
+		GManWidgetMaxResults.show()
+		GManConfigDialog.vbox.add ( GManWidgetMaxResults )
+
+		GManWidgetSubStringSearch = gtk.HBox ()
+		GManWidgetSubStringSearchEntry = gtk.Entry (3)
+		GManWidgetSubStringSearchEntry.set_text ('!' )
+		GManWidgetSubStringSearchEntry.show()
+		GManWidgetSubStringSearch.add ( GManWidgetSubStringSearchEntry )
+		GManWidgetSubStringSearchLabel = gtk.Label('Substring search prefix')
+		GManWidgetSubStringSearchLabel.show()
+		GManWidgetSubStringSearch.add ( GManWidgetSubStringSearchLabel )
+		GManWidgetSubStringSearch.show()
+		GManConfigDialog.vbox.add ( GManWidgetSubStringSearch )
+
+		GManWidgetWhatisLocationLabel = gtk.Label('absolute path to "whatis" binary:')
+		GManWidgetWhatisLocationLabel.show()
+		GManConfigDialog.vbox.add ( GManWidgetWhatisLocationLabel )
+
+		GManWidgetWhatisLocation = gtk.Entry(20)
+		GManWidgetWhatisLocation.set_has_frame = True
+		GManWidgetWhatisLocation.set_text ('/usr/bin/whatis' )
+		GManWidgetWhatisLocation.show()
+		GManConfigDialog.vbox.add ( GManWidgetWhatisLocation )
+
+		GManWidgetYelpLocationLabel = gtk.Label('absolute path to "yelp" binary:')
+		GManWidgetYelpLocationLabel.show()
+		GManConfigDialog.vbox.add ( GManWidgetYelpLocationLabel )
+
+		GManWidgetYelpLocation = gtk.Entry(20)
+		GManWidgetYelpLocation.set_has_frame = True
+		GManWidgetYelpLocation.set_text ('/usr/bin/yelp')
+		GManWidgetYelpLocation.show()
+		GManConfigDialog.vbox.add ( GManWidgetYelpLocation )
+
+		GManConfigDialogReturn = GManConfigDialog.run()
+		GManConfigDialog.destroy()
+
+		
 	@staticmethod
 	def has_requirements():
 		if os.path.isfile(WHATIS):
