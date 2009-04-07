@@ -19,7 +19,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
+# Some configuration options, tweak as appropriate
+WHATIS      = '/usr/bin/whatis'
+YELP        = '/usr/bin/yelp'
+PARTIALCHAR = '!'
+RESULTLIMIT = 10
+
+# You should not change anything below this line under normal circumnstances
+# (unless you are here to code, in which case, be my guest!)
 import deskbar.interfaces.Action
 import deskbar.interfaces.Match
 import deskbar.core.Utils
@@ -30,12 +39,6 @@ import os.path
 NAME        = "G-Man"
 DESCRIPTION = "Search through available MAN pages"
 VERSION     = "0.2.1"
-
-# configuration options
-WHATIS      = '/usr/bin/whatis'
-YELP        = '/usr/bin/yelp'
-PARTIALCHAR = '!'
-RESULTLIMIT = 10
 
 HANDLERS = ["GManPageModule"]
 

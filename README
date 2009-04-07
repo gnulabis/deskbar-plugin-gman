@@ -2,7 +2,7 @@
 
 deskbar-plugin-gman is a plugin for the deskbar applet. It allows searching of locally stored MAN pages. The selected MAN page is displayed using the GNOME documentation viewer (Yelp). 
 
-deskbar-plugin-gman is losely based on G-MAN (hence the name of the plugin), a "quick n' dirty" Bash script that accomplishes a similar goal.
+deskbar-plugin-gman is loosely based on G-MAN (hence the name of the plugin), a "quick n' dirty" Bash script that accomplishes a similar goal.
 
 2. DEPENDENCIES
 
@@ -28,4 +28,8 @@ A couple of points that will help you understand and use more efficiently this p
 
 - If you would like to type "rsyn" and get a match for "wcursyncup" as well, you should add the prefix '!' to your query (eg. "!rsyn").
 
+- The plugin currently limits the number of results to 10.
 
+- You can modify the search path for Yelp and Whatis, as well as the number of displayed results and the character used to enable full substring searches, by editing the python file itself (look in the first couple of lines)
+
+- There will be a configuration window in the near future to make this easier. Currently there is a BROKEN experimental GUI in the "experimental_gui" branch of the repository.
