@@ -164,9 +164,9 @@ class GManPageModule (deskbar.interfaces.Module):
 		GManConfigDialogResponse = GManConfigDialog.run() 
 
 		if GManConfigDialogResponse == gtk.RESPONSE_OK:
-			self.resultlimit = GManWidgetMaxResultsSpin.get_value()
+			self.resultlimit = int (GManWidgetMaxResultsSpin.get_value())
 			self.searchchar  = GManWidgetSubStringSearchEntry.get_text()
-			self.write_cfg(	self.resultlimit, self.searchchar )
+			self.write_cfg(	int(self.resultlimit), self.searchchar )
 
 		GManConfigDialog.destroy()
 
@@ -184,7 +184,7 @@ class GManPageModule (deskbar.interfaces.Module):
 				return config
 
 
-		return self.write_cfg (GMAN_DEFAULT_RESULTLIMIT, GMAN_DEFAULT_SEARCHCHAR)
+		return self.write_cfg (int(GMAN_DEFAULT_RESULTLIMIT), GMAN_DEFAULT_SEARCHCHAR)
 
 	@staticmethod
 	def write_cfg (rlimit, schar):
@@ -194,7 +194,7 @@ class GManPageModule (deskbar.interfaces.Module):
 			os.mkdir (GMAN_CONFIG_DIR, GMAN_CONFIG_DIR_PERMISSIONS)
 		
 		config.add_section ('Preferences')
-		config.set('Preferences', 'resultlimit', rlimit)
+		config.set('Preferences', 'resultlimit', int(rlimit))
 		config.set('Preferences', 'searchchar', schar)
 		cfgfile = open ( GMAN_CONFIG, 'w' )
 		config.write (cfgfile)
