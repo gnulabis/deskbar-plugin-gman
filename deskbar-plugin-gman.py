@@ -101,7 +101,6 @@ class GManPageModule (deskbar.interfaces.Module):
 		self.resultlimit =  config.getint('Preferences', 'resultlimit')
 		self.searchchar = config.get('Preferences', 'searchchar')
 
-
 	def query(self, text):
 		if len(text) > 1:
 			if ( text[0] == self.searchchar ) and (len(text) > 2):
@@ -127,55 +126,51 @@ class GManPageModule (deskbar.interfaces.Module):
 						( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
 						  gtk.STOCK_OK, gtk.RESPONSE_OK ) )
 		
+
 		GManWidgetMaxResults = gtk.HBox ()
+		GManWidgetMaxResults.homogeneous = True
+
+		GManWidgetMaxResultsSpinAlign = gtk.Alignment (0.0, 0.0, 0.0, 0.0)
 		GManWidgetMaxResultsSpin = gtk.SpinButton ()
 		GManWidgetMaxResultsSpin.set_range (1, 50)
 		GManWidgetMaxResultsSpin.set_increments (1,10)
-		GManWidgetMaxResultsSpin.show()
-		GManWidgetMaxResults.add ( GManWidgetMaxResultsSpin )
-		GManWidgetMaxResultsLabel = gtk.Label('max results')
-		GManWidgetMaxResultsLabel.show()
-		GManWidgetMaxResults.add ( GManWidgetMaxResultsLabel )
-		GManWidgetMaxResults.show()
-		GManConfigDialog.vbox.add ( GManWidgetMaxResults )
+		GManWidgetMaxResultsSpin.set_value (self.resultlimit)
+		GManWidgetMaxResultsSpinAlign.add ( GManWidgetMaxResultsSpin )
 
+		GManWidgetMaxResults.add ( GManWidgetMaxResultsSpinAlign )
+
+		GManWidgetMaxResultsLabel = gtk.Label('Max results')
+		GManWidgetMaxResults.add ( GManWidgetMaxResultsLabel )
+
+		GManConfigDialog.vbox.add ( GManWidgetMaxResults )
+		
 		GManWidgetSubStringSearch = gtk.HBox ()
+		GManWidgetSubStringSearch.homogeneous = True
+
+		GManWidgetSubStringSearchEntryAlign = gtk.Alignment (0.0, 0.0, 0.0, 0.0)
 		GManWidgetSubStringSearchEntry = gtk.Entry (3)
-		GManWidgetSubStringSearchEntry.set_text ('!' )
-		GManWidgetSubStringSearchEntry.show()
-		GManWidgetSubStringSearch.add ( GManWidgetSubStringSearchEntry )
+		GManWidgetSubStringSearchEntry.set_text (self.searchchar)
+		GManWidgetSubStringSearchEntryAlign.add ( GManWidgetSubStringSearchEntry )
+
+		GManWidgetSubStringSearch.add ( GManWidgetSubStringSearchEntryAlign )
+
 		GManWidgetSubStringSearchLabel = gtk.Label('Substring search prefix')
-		GManWidgetSubStringSearchLabel.show()
 		GManWidgetSubStringSearch.add ( GManWidgetSubStringSearchLabel )
-		GManWidgetSubStringSearch.show()
+
 		GManConfigDialog.vbox.add ( GManWidgetSubStringSearch )
 
-		GManWidgetWhatisLocationLabel = gtk.Label('absolute path to "whatis" binary:')
-		GManWidgetWhatisLocationLabel.show()
-		GManConfigDialog.vbox.add ( GManWidgetWhatisLocationLabel )
 
-		GManWidgetWhatisLocation = gtk.Entry(20)
-		GManWidgetWhatisLocation.set_has_frame = True
-		GManWidgetWhatisLocation.set_text ('/usr/bin/whatis' )
-		GManWidgetWhatisLocation.show()
-		GManConfigDialog.vbox.add ( GManWidgetWhatisLocation )
+		GManConfigDialog.vbox.show_all()
+		GManConfigDialogResponse = GManConfigDialog.run() 
 
-		GManWidgetYelpLocationLabel = gtk.Label('absolute path to "yelp" binary:')
-		GManWidgetYelpLocationLabel.show()
-		GManConfigDialog.vbox.add ( GManWidgetYelpLocationLabel )
+		if GManConfigDialogResponse == gtk.RESPONSE_OK:
+			self.resultlimit = GManWidgetMaxResultsSpin.get_value()
+			self.searchchar  = GManWidgetSubStringSearchEntry.get_text()
+			self.write_cfg(	self.resultlimit, self.searchchar )
 
-		GManWidgetYelpLocation = gtk.Entry(20)
-		GManWidgetYelpLocation.set_has_frame = True
-		GManWidgetYelpLocation.set_text ('/usr/bin/yelp')
-		GManWidgetYelpLocation.show()
-		GManConfigDialog.vbox.add ( GManWidgetYelpLocation )
-
-		GManConfigDialogReturn = GManConfigDialog.run()
 		GManConfigDialog.destroy()
 
-		
-	@staticmethod	
-	def read_cfg ():
+	def read_cfg (self):
 		config = RawConfigParser()
 		CreateConfig = False
 
@@ -183,28 +178,28 @@ class GManPageModule (deskbar.interfaces.Module):
 			cfgfile = open ( GMAN_CONFIG, 'r' )
 			config.readfp (cfgfile)
 			cfgfile.close ()
-			if not ( config.has_section('Preferences') and
-				 config.has_option('Preferences', 'resultlimit') and
-				 config.has_option('Preferences', 'searchchar') ):
-				for section in config.sections():
-					config.remove_section (section)
-				CreateConfig = True
+			if ( config.has_section('Preferences') and
+			     config.has_option('Preferences', 'resultlimit') and
+			     config.has_option('Preferences', 'searchchar') ):
+				return config
 
-		else:
-			if not exists (GMAN_CONFIG_DIR):
-				os.mkdir (GMAN_CONFIG_DIR, GMAN_CONFIG_DIR_PERMISSIONS)
-			CreateConfig = True
 
-		if CreateConfig:
-			config.add_section ('Preferences')
-			config.set('Preferences', 'resultlimit', GMAN_DEFAULT_RESULTLIMIT)
-			config.set('Preferences', 'searchchar', GMAN_DEFAULT_SEARCHBAR)
-			cfgfile = open ( GMAN_CONFIG, 'w' )
-			config.write (cfgfile)
-			cfgfile.close ()
+		return self.write_cfg (GMAN_DEFAULT_RESULTLIMIT, GMAN_DEFAULT_SEARCHCHAR)
 
-		return config	
+	@staticmethod
+	def write_cfg (rlimit, schar):
+		config = RawConfigParser()
 
+		if not exists (GMAN_CONFIG_DIR):
+			os.mkdir (GMAN_CONFIG_DIR, GMAN_CONFIG_DIR_PERMISSIONS)
+		
+		config.add_section ('Preferences')
+		config.set('Preferences', 'resultlimit', rlimit)
+		config.set('Preferences', 'searchchar', schar)
+		cfgfile = open ( GMAN_CONFIG, 'w' )
+		config.write (cfgfile)
+		cfgfile.close ()
+		return config
 
 	@staticmethod
 	def has_requirements():
@@ -216,3 +211,7 @@ class GManPageModule (deskbar.interfaces.Module):
 		else:
 			GManPageModule.INSTRUCTIONS = 'Cannot find "' + WHATIS + '". Please install the MAN database (man-db package) first'
 		return False
+
+#Purely for debug purpose
+if __name__ == '__main__':
+	test = GManPageModule()
