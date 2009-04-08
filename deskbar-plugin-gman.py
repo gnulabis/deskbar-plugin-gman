@@ -21,12 +21,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Some configuration options, tweak as appropriate
-WHATIS      = '/usr/bin/whatis'
-YELP        = '/usr/bin/yelp'
-PARTIALCHAR = '!'
-RESULTLIMIT = 10
-
 # You should not change anything below this line under normal circumnstances
 # (unless you are here to code, in which case, be my guest!)
 import deskbar.interfaces.Action
@@ -34,11 +28,27 @@ import deskbar.interfaces.Match
 import deskbar.core.Utils
 import deskbar.interfaces.Module
 import commands
-import os.path
+import os
+from os.path import *
+from ConfigParser import RawConfigParser
+
+# Names of external binaries
+WHATIS      = 'whatis'
+YELP        = 'yelp'
+
+# Location of configuration file for the G-Man plugin
+GMAN_CONFIG_DIR = expanduser ('~/.config/deskbar-applet')
+GMAN_CONFIG_DIR_PERMISSIONS = 0755
+GMAN_CONFIG_FILE = 'deskbar-plugin-gman.conf'
+GMAN_CONFIG = join (GMAN_CONFIG_DIR, GMAN_CONFIG_FILE)
+
+# Default configuration values
+GMAN_DEFAULT_RESULTLIMIT = "20"
+GMAN_DEFAULT_SEARCHCHAR = "!"
 
 NAME        = "G-Man"
 DESCRIPTION = "Search through available MAN pages"
-VERSION     = "0.2.1"
+VERSION     = "0.5.1"
 
 HANDLERS = ["GManPageModule"]
 
@@ -83,29 +93,68 @@ class GManPageModule (deskbar.interfaces.Module):
 		'version': VERSION,
 		}
 	
+
 	def __init__(self):
 		deskbar.interfaces.Module.__init__(self)
-		
+
+		config = self.read_cfg ()
+		self.resultlimit =  config.getint('Preferences', 'resultlimit')
+		self.searchchar = config.get('Preferences', 'searchchar')
+
+
 	def query(self, text):
 		if len(text) > 1:
-			if ( text[0] == PARTIALCHAR ) and (len(text) > 2):
+			if ( text[0] == self.searchchar ) and (len(text) > 2):
 				outputofwhatis = commands.getstatusoutput( WHATIS + ' -r ' + text[1:] )
 			else:
 				outputofwhatis = commands.getstatusoutput( WHATIS + ' -w ' + text + '*' )
 
 			if outputofwhatis[1].endswith ( 'nothing appropriate.' ) is not True :
-				if len(outputofwhatis[1].splitlines()) > RESULTLIMIT:
-					results = outputofwhatis[1].splitlines()[:RESULTLIMIT]
+				if len(outputofwhatis[1].splitlines()) > self.resultlimit:
+					results = outputofwhatis[1].splitlines()[:self.resultlimit]
 				else:
 					results = outputofwhatis[1].splitlines()
 
 				for match in results:
 					self._emit_query_ready( text, [ GManPageMatch( match.split(' - ')[0].strip()) ] )
 
+
+	@staticmethod	
+	def read_cfg ():
+		config = RawConfigParser()
+		CreateConfig = False
+
+		if exists ( GMAN_CONFIG ):
+			cfgfile = open ( GMAN_CONFIG, 'r' )
+			config.readfp (cfgfile)
+			cfgfile.close ()
+			if not ( config.has_section('Preferences') and
+				 config.has_option('Preferences', 'resultlimit') and
+				 config.has_option('Preferences', 'searchchar') ):
+				for section in config.sections():
+					config.remove_section (section)
+				CreateConfig = True
+
+		else:
+			if not exists (GMAN_CONFIG_DIR):
+				os.mkdir (GMAN_CONFIG_DIR, GMAN_CONFIG_DIR_PERMISSIONS)
+			CreateConfig = True
+
+		if CreateConfig:
+			config.add_section ('Preferences')
+			config.set('Preferences', 'resultlimit', GMAN_DEFAULT_RESULTLIMIT)
+			config.set('Preferences', 'searchchar', GMAN_DEFAULT_SEARCHBAR)
+			cfgfile = open ( GMAN_CONFIG, 'w' )
+			config.write (cfgfile)
+			cfgfile.close ()
+
+		return config	
+
+
 	@staticmethod
 	def has_requirements():
-		if os.path.isfile(WHATIS):
-			if os.path.isfile(YELP):
+		if deskbar.core.Utils.is_program_in_path (WHATIS):
+			if deskbar.core.Utils.is_program_in_path (YELP):
 				return True
 			else:
 				GManPageModule.INSTRUCTIONS = 'Cannot find "' + YELP + '". Please install the Yelp package first'
