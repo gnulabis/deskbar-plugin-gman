@@ -8,7 +8,7 @@ deskbar-plugin-gman is loosely based on G-MAN (hence the name of the plugin), a 
 
 deskbar-plugin-gman assumes that you have installed and are running the GNOME desktop environment, as well as the deskbar-applet itself. It has also been tested with XFCE, with the help of xfapplet (which allows you to load a GNOME applet in the XFCE panel).
 
-There are no build dependencies. To actually run the plugin, you need to have Yelp (basic component of GNOME), as well as the man-db package (fundamental part of most Linux distributions).
+There are no build dependencies. To actually run the plugin, you need to have Yelp (basic component of GNOME), as well as the man-db package (fundamental part of most Linux distributions). To use the configuration dialog you need to have python-gtk (should be automatically installed on your system with deskbar-applet itself).
 
 If you are missing any of those two (Yelp and/or man-db), the plugin will refuse to load and will inform you of the problem.
 

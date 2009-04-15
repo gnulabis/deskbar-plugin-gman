@@ -49,7 +49,7 @@ GMAN_DEFAULT_SEARCHCHAR = "!"
 
 NAME        = "G-Man"
 DESCRIPTION = "Search through available MAN pages"
-VERSION     = "0.6.0"
+VERSION     = "0.7.1"
 
 HANDLERS = ["GManPageModule"]
 
@@ -129,6 +129,7 @@ class GManPageModule (deskbar.interfaces.Module):
 
 		GManWidgetMaxResults = gtk.HBox ()
 		GManWidgetMaxResults.homogeneous = True
+		GManWidgetMaxResults.set_tooltip_text( "Set the limit of results to be shown on screen" )
 
 		GManWidgetMaxResultsSpinAlign = gtk.Alignment (0.0, 0.0, 0.0, 0.0)
 		GManWidgetMaxResultsSpin = gtk.SpinButton ()
@@ -146,7 +147,7 @@ class GManPageModule (deskbar.interfaces.Module):
 		
 		GManWidgetSubStringSearch = gtk.HBox ()
 		GManWidgetSubStringSearch.homogeneous = True
-
+		GManWidgetSubStringSearch.set_tooltip_text ( "Set the special character to use in the beginning of a query for substring searches" )
 		GManWidgetSubStringSearchEntryAlign = gtk.Alignment (0.0, 0.0, 0.0, 0.0)
 		GManWidgetSubStringSearchEntry = gtk.Entry (3)
 		GManWidgetSubStringSearchEntry.set_text (self.searchchar)
