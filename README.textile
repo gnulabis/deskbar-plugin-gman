@@ -4,7 +4,7 @@ deskbar-plugin-gman is a plugin for the deskbar applet. It allows searching of l
 
 deskbar-plugin-gman is loosely based on "G-MAN":http://github.com/gnulabis/g-man (hence the name of the plugin), a "quick n' dirty" Bash script that accomplishes a similar goal.
 
-h2. DEPENDENCIES
+h1. DEPENDENCIES
 
 deskbar-plugin-gman assumes that you have installed and are running the GNOME desktop environment, as well as the deskbar-applet itself. It has also been tested with XFCE, with the help of "xfapplet":http://goodies.xfce.org/projects/panel-plugins/xfce4-xfapplet-plugin (which allows you to load a GNOME applet in the XFCE panel).
 
@@ -12,23 +12,23 @@ There are no build dependencies. To actually run the plugin, you need to have Ye
 
 _If you are missing any of those two (Yelp and/or man-db), the plugin will refuse to load and will inform you of the problem._
 
-h3. INSTALLATION
+h1. INSTALLATION
 
 Please follow the steps described in the INSTALL file.
 
-h4. USAGE
+h1. USAGE
 
 Provided that you have added the plugin to the list of available handlers in the preferences dialog of the deskbar-applet and you have enabled it, the basic usage is the same as for every other deskbar plugin: you type a query and you get a list of results.
 
 A couple of points that will help you understand and use more efficiently this plugin:
 
-* The plugin does not display any results for single character queries. It starts searching after you've typed the second character (unless a '!' is the first character -see below for an explanation-, in which case the plugin waits until you type the third character).
+* The plugin does not display any results for single character queries. It starts searching after you've typed the second character (unless a '!' is the first character, in which case the plugin waits until you type the third character. See below for an explanation on '!').
 * When you type something, the plugin tries to match it to the name of a MAN page, starting from its first letter. In other words, if you type "rsyn" (and you have installed the "rsync" application) the plugin will match "rsync" and "rsyncd.conf", but not "wcursyncup".
 * If you would like to type "rsyn" and get a match for "wcursyncup" as well, you should add the prefix '!' to your query (eg. "!rsyn").
 * The plugin limits by default the number of results to 20.
 * You can modify the number of displayed results and the character used to enable full substring searches, by accessing the configuration options of the plugin.
-* The options can be found in deskbar-applet->preferences->G-Man->More. These options are saved between sessions in the configuration file.
-* The plugin configuration file can be found inside your home folder, in <code>.config/deskbar-applet/deskbar-plugin-gman.conf</code>
+* The options can be found in _deskbar-applet->preferences->G-Man->More_. These options are saved between sessions in the configuration file.
+* The plugin configuration file can be found inside your home folder, in _.config/deskbar-applet/deskbar-plugin-gman.conf_
 * If you modify these values directly on the file (eg. with an editor), you need to reload the plugin (from the deskbar-applet configuration window)
 * If the configuration file is missing, or it is corrupted, it will be recreated with the default values
 
